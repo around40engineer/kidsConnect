@@ -1,4 +1,4 @@
-vi.mock('../hooks/use-toast', async (importOriginal:()=>Promise<any>) => {
+vi.mock('@/hooks/use-toast', async (importOriginal:()=>Promise<any>) => {
   const mod = await importOriginal();
   return {
     ...mod,
@@ -7,7 +7,7 @@ vi.mock('../hooks/use-toast', async (importOriginal:()=>Promise<any>) => {
 });
 
 import {act, renderHook} from '@testing-library/react';
-import {reducer, ToasterToast, useToast} from '../hooks/use-toast';
+import {reducer, ToasterToast, useToast} from '@/hooks/use-toast';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 vi.useFakeTimers();
@@ -155,6 +155,11 @@ describe('useToast', () => {
     });
     
     expect(result.current.toasts.length).toBe(0);
+  });
+
+  it('toast関数が提供される', () => {
+    const { result } = renderHook(() => useToast());
+    expect(result.current.toast).toBeDefined();
   });
 });
 

@@ -1,7 +1,7 @@
 import { beforeAll, beforeEach, describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import RegisterPage from '../app/register/page';
+import RegisterPage from '@/app/register/page';
 
 // useRouterのモック
 const mockPush = vi.fn();
@@ -12,7 +12,7 @@ vi.mock('next/navigation', () => ({
 }));
 
 // useToastのモック
-vi.mock('../hooks/use-toast', () => ({
+vi.mock('@/hooks/use-toast', () => ({
   useToast: () => ({ toast: vi.fn() }),
 }));
 

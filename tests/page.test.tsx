@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import Home from '../app/page';
+import HomePage from '@/app/page';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -8,54 +8,60 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-describe('Home', () => {
+describe('HomePage', () => {
+  it('タイトルが表示される', () => {
+    render(<HomePage />);
+    const titles = screen.getAllByText('KidConnect');
+    expect(titles.length).toBeGreaterThan(0);
+  });
+
   it('Headerコンポーネントがレンダリングされる', () => {
-    render(<Home />);
+    render(<HomePage />);
     expect(screen.getByRole('banner')).toBeInTheDocument();
   });
 
   it('Heroコンポーネントがレンダリングされる', () => {
-    render(<Home />);
+    render(<HomePage />);
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
   });
 
   it('Featuresコンポーネントがレンダリングされる', () => {
-    render(<Home />);
+    render(<HomePage />);
     expect(screen.getByRole('heading', { name: '施設運営をもっとシンプルに、もっと安全に' })).toBeInTheDocument();
   });
 
   it('Benefitsコンポーネントがレンダリングされる', () => {
-    render(<Home />);
+    render(<HomePage />);
     expect(screen.getByRole('heading', { name: 'なぜ KidConnect なのか' })).toBeInTheDocument();
   });
 
   it('HowItWorksコンポーネントがレンダリングされる', () => {
-    render(<Home />);
+    render(<HomePage />);
     expect(screen.getByRole('heading', { name: '導入から活用までの流れ' })).toBeInTheDocument();
   });
 
   it('Testimonialsコンポーネントがレンダリングされる', () => {
-    render(<Home />);
+    render(<HomePage />);
     expect(screen.getByRole('heading', { name: '導入施設からの声' })).toBeInTheDocument();
   });
 
   it('Pricingコンポーネントがレンダリングされる', () => {
-    render(<Home />);
+    render(<HomePage />);
     expect(screen.getByRole('heading', { name: 'シンプルな料金プラン' })).toBeInTheDocument();
   });
 
   it('FAQコンポーネントがレンダリングされる', () => {
-    render(<Home />);
+    render(<HomePage />);
     expect(screen.getByRole('heading', { name: 'よくあるご質問' })).toBeInTheDocument();
   });
 
   it('CTAコンポーネントがレンダリングされる', () => {
-    render(<Home />);
+    render(<HomePage />);
     expect(screen.getByRole('heading', { name: '無料で始める' })).toBeInTheDocument();
   });
 
   it('Footerコンポーネントがレンダリングされる', () => {
-    render(<Home />);
+    render(<HomePage />);
     expect(screen.getByRole('contentinfo')).toBeInTheDocument();
   });
 }); 

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import AdminPage from '../../app/admin/page';
+import AdminPage from '@/app/admin/page';
 
 describe('AdminPage', () => {
     it('タイトルが正しく表示される', () => {
