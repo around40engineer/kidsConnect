@@ -12,7 +12,7 @@ export function Hero() {
             <h1 className="font-mochiy text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
               <span className="block">保育施設の運営を</span>
               <span className="bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
-                LINE一つでカンタンに
+                LINEひとつでカンタンに
               </span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl">
