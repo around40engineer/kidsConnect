@@ -15,8 +15,9 @@ const QrCodeScanner: FC<Props> = () => {
             const constraints = {
                 video: {
                     facingMode: 'environment',
-                    width: { ideal: 300 },
-                    height: { ideal: 300 },
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                    aspectRatio: { ideal: 16/9 }
                 },
             }
 
@@ -48,7 +49,7 @@ const QrCodeScanner: FC<Props> = () => {
         if (result) {
             setTimeout(() => {
                 setResult('')
-            }, 2000)
+            }, 3000)
         }
     }, [result]);
 
@@ -59,8 +60,13 @@ const QrCodeScanner: FC<Props> = () => {
         if (canvas && video) {
             const ctx = canvas.getContext('2d')
             if (ctx) {
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+                const width = window.innerWidth * 0.75
+                const height = window.innerHeight * 0.75
+                canvas.width = width
+                canvas.height = height
+                
+                ctx.drawImage(video, 0, 0, width, height)
+                const imageData = ctx.getImageData(0, 0, width, height)
                 const qrCodeData = jsQR(imageData.data, imageData.width, imageData.height)
                 if (qrCodeData) {
                     if (qrCodeData.data !== 'http://localhost:3000/result') {
@@ -76,12 +82,20 @@ const QrCodeScanner: FC<Props> = () => {
     }
 
     return (
-        <div>
+        <div className="w-full flex justify-center items-center">
             {!result && (
-                <div className='flex justify-center'>
-                    <div className='relative h-[300px] w-[300px]'>
-                        <video ref={videoRef} autoPlay playsInline className='absolute left-0 top-0 -z-50 h-[300px] w-[300px]' />
-                        <canvas ref={canvasRef} width='300' height='300' className='absolute left-0 top-0' />
+                <div className='w-full flex justify-center items-center'>
+                    <div className='relative aspect-video w-[75vw] max-w-[75vw] mx-auto'>
+                        <video 
+                            ref={videoRef} 
+                            autoPlay 
+                            playsInline 
+                            className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full object-cover' 
+                        />
+                        <canvas 
+                            ref={canvasRef} 
+                            className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full' 
+                        />
                     </div>
                 </div>
             )}

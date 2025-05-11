@@ -81,7 +81,7 @@ export default function MiniAppPage() {
             </div>
           </div>
 
-          <Tabs defaultValue="all" className="mb-4">
+          <Tabs value={selectedTab} onValueChange={setSelectedTab} className="mb-4">
             <TabsList className="w-full">
               <TabsTrigger value="all" className="flex-1">すべて</TabsTrigger>
               <TabsTrigger value="image" className="flex-1">
