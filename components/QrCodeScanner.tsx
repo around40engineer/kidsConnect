@@ -1,112 +1,93 @@
 'use client'
 import jsQR from 'jsqr'
-import React, { useRef, useState, useEffect, FC } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 
-type Props = {}
-const QrCodeScanner: FC<Props> = () => {
-    const videoRef = useRef<HTMLVideoElement>(null)
-    const canvasRef = useRef<HTMLCanvasElement>(null)
-    const [result, setResult] = useState('')
-    const [error, setError] = useState('')
+export default function QrCodeScanner() {
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [isScanning, setIsScanning] = useState(true)
 
-    useEffect(() => {
-        if(!result
-        ){
-            const constraints = {
-                video: {
-                    facingMode: 'environment',
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 },
-                    aspectRatio: { ideal: 16/9 }
-                },
+  useEffect(() => {
+    const video = videoRef.current
+    const canvas = canvasRef.current
+    if (!video || !canvas) return
+
+    const context = canvas.getContext('2d')
+    if (!context) return
+
+    const startCamera = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        video.srcObject = stream
+        video.play()
+
+        const scanQR = () => {
+          if (!isScanning) return
+
+          if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            canvas.height = video.videoHeight
+            canvas.width = video.videoWidth
+            context.drawImage(video, 0, 0, canvas.width, canvas.height)
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
+            const code = jsQR(imageData.data, imageData.width, imageData.height)
+
+            if (code) {
+              if (code.data === 'http://localhost:3000/result') {
+                setIsScanning(false)
+                // ここで入場処理を行う
+                console.log('入場を受け付けました')
+              }
             }
-
-            navigator.mediaDevices
-                .getUserMedia(constraints)
-                .then((stream) => {
-                    if (videoRef.current) {
-                        videoRef.current.srcObject = stream
-                        videoRef.current.play()
-                        scanQrCode()
-                    }
-                })
-                .catch((err) => console.error('Error accessing media devices:', err))
-
-            const currentVideoRef = videoRef.current
-
-        return () => {
-            if (currentVideoRef && currentVideoRef.srcObject) {
-                const stream = currentVideoRef.srcObject as MediaStream
-                const tracks = stream.getTracks()
-                tracks.forEach((track) => track.stop())
-            }
+          }
+          requestAnimationFrame(scanQR)
         }
 
-        }
-    }, [result])
-
-    useEffect(() => {
-        if (result) {
-            setTimeout(() => {
-                setResult('')
-            }, 3000)
-        }
-    }, [result]);
-
-
-    const scanQrCode = () => {
-        const canvas = canvasRef.current
-        const video = videoRef.current
-        if (canvas && video) {
-            const ctx = canvas.getContext('2d')
-            if (ctx) {
-                const width = window.innerWidth * 0.75
-                const height = window.innerHeight * 0.75
-                canvas.width = width
-                canvas.height = height
-                
-                ctx.drawImage(video, 0, 0, width, height)
-                const imageData = ctx.getImageData(0, 0, width, height)
-                const qrCodeData = jsQR(imageData.data, imageData.width, imageData.height)
-                if (qrCodeData) {
-                    if (qrCodeData.data !== 'http://localhost:3000/result') {
-                        setTimeout(scanQrCode, 100)
-                        return
-                    }
-                    setResult(qrCodeData.data)
-                    return
-                }
-                setTimeout(scanQrCode, 100)
-            }
-        }
+        scanQR()
+      } catch (err) {
+        setError('カメラへのアクセスに失敗しました')
+        console.error('カメラエラー:', err)
+      }
     }
 
-    return (
-        <div className="w-full flex justify-center items-center">
-            {!result && (
-                <div className='w-full flex justify-center items-center'>
-                    <div className='relative aspect-video w-[75vw] max-w-[75vw] mx-auto'>
-                        <video 
-                            ref={videoRef} 
-                            autoPlay 
-                            playsInline 
-                            className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full object-cover' 
-                        />
-                        <canvas 
-                            ref={canvasRef} 
-                            className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full' 
-                        />
-                    </div>
-                </div>
-            )}
-            {result && (
-                <div className='flex justify-center'>
-                    <p>入場を受け付けました</p>
-                </div>
-            )}
-            {error && <p className='text-center text-xs text-red-500'>{error}</p>}
-        </div>
-    )
-}
+    startCamera()
 
-export default QrCodeScanner
+    return () => {
+      const stream = video.srcObject as MediaStream
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop())
+      }
+    }
+  }, [isScanning])
+
+  if (error) {
+    return (
+      <div className="text-center p-4">
+        <p className="text-red-500">{error}</p>
+      </div>
+    )
+  }
+
+  if (!isScanning) {
+    return (
+      <div className="text-center p-4">
+        <p className="text-green-500">入場を受け付けました</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="relative w-full max-w-3xl mx-auto">
+      <video
+        ref={videoRef}
+        className="w-full rounded-lg"
+        data-testid="video"
+      />
+      <canvas
+        ref={canvasRef}
+        className="hidden"
+        data-testid="canvas"
+      />
+    </div>
+  )
+}
